@@ -22,9 +22,11 @@ class Unit {
     }
     
     func attack(to enemy: Unit) -> Int {
+        let enemyProtection = enemy.protection
+        
         // Генерация силы удара от 0 до 31
         damage = Int(arc4random_uniform(31))
-        if enemy.protection > 20 {
+        if enemyProtection > 20 {
             if damage % 2 == 1 {
                 damage -= 1
             }
@@ -58,17 +60,30 @@ class Battlefield {
     init(game: String) {
         self.game = game
     }
-    func beginBattle(with: [Unit]) -> String {
-        var array = with
+    func beginBattle(with units: [Unit]) -> String {
+        var array = units
         var array2 = array
         var game = true
-        while (game) {
-            for i in 0..<(array.count-1) {
-                array[i].attack(to: array[i+1])
-                if array[i+1].damage == 0 {
-                    array[i+1].lesions += 1
-                    array2[i+1] = array[i+1]
-                    array.remove(at: (i+1))
+        var sum = 0
+        
+        while game {
+            for i in 0..<(array.count - 2) {
+                if i == array.count {
+                    array[i].attack(to: array[0])
+                    if array[0].damage == 0 {
+                        array[0].lesions += 1
+                        array2[0] = array[i+1]
+                    }
+                    sum += 1
+                }
+                else {
+                    array[i].attack(to: array[i+1])
+                    if array[i+1].damage == 0 {
+                        array[i+1].lesions += 1
+                        array2[i+1] = array[i+1]
+                        array.remove(at: (i+1))
+                    }
+                    sum += 1
                 }
                 if array.count == 1 {
                     game = false
@@ -113,8 +128,9 @@ players.append(Mage(nickname: "Mag", skill: 40, protection: 20, damage: 0, healt
 players.append(Knight(nickname: "Knight", skill: 30, protection: 10, damage: 0, health: 100, wins: 4, lesions: 4))
 players.append(Assassin(nickname: "Assasian", skill: 20, protection: 5, damage: 0, health: 100, wins: 5, lesions: 0))
 players.append(Mage(nickname: "Mag2", skill: 10, protection: 20, damage: 0, health: 100, wins: 3, lesions: 2))
-var game = Battlefield(game: "Добро пожаловать в игру")
-var topTable = game.beginBattle(with: players)
+var game1 = Battlefield(game: "Добро пожаловать в игру")
+
+var topTable = game1.beginBattle(with: players)
 
 
 
